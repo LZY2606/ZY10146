@@ -1,6 +1,6 @@
 import type { DotObjectModel } from '@ts-graphviz/common';
 import { createElementFactory } from '../../builder/create-element.js';
-import { defaultPlugins } from './plugins/index.js';
+import { buildFromModel } from './build-from-model.js';
 import type {
   ConvertFromModelContext,
   ConvertFromModelOptions,
@@ -8,16 +8,38 @@ import type {
   ModelToAST,
 } from './types.js';
 
+const STANDARD_MODEL_TYPES = new Set([
+  'Graph',
+  'AttributeList',
+  'Node',
+  'Edge',
+  'Subgraph',
+]);
+
 /**
- * FromModelConverter is a class used to convert a {@link DotObjectModel} into an ASTNode.
+ * FromModelConverter converts a {@link DotObjectModel} into an AST node.
+ *
+ * The standard model kinds are converted through the shared, iterative
+ * visitor skeleton (`@ts-graphviz/common/internal/traversal`). A custom
+ * plugin registered with {@link FromModelConverter.use} takes over when it
+ * matches a model (e.g. a user-defined `$$type`).
  *
  * @group Convert Model to AST
  */
 export class FromModelConverter {
   /** @hidden */
-  #plugins: ConvertFromModelPlugin<DotObjectModel>[] = [...defaultPlugins];
+  #plugins: ConvertFromModelPlugin<DotObjectModel>[] = [];
 
   constructor(private options: ConvertFromModelOptions = {}) {}
+
+  /**
+   * Register a custom conversion plugin. Custom plugins are consulted before
+   * the standard shared traversal.
+   */
+  public use(plugin: ConvertFromModelPlugin<DotObjectModel>): this {
+    this.#plugins.unshift(plugin);
+    return this;
+  }
 
   /**
    * Converts a DotObjectModel into an AST.
@@ -29,18 +51,32 @@ export class FromModelConverter {
     const plugins = [...this.#plugins];
     const { commentKind = 'Slash', maxASTNodes } = this.options;
     const createElement = createElementFactory({ maxASTNodes });
-    const context: ConvertFromModelContext = {
-      commentKind,
+
+    for (const plugin of plugins) {
+      if (plugin.match(model)) {
+        const context: ConvertFromModelContext = {
+          commentKind,
+          createElement,
+          convert<U extends DotObjectModel>(m: U): ModelToAST<U> {
+            for (const p of plugins) {
+              if (p.match(m)) return p.convert(context, m) as ModelToAST<U>;
+            }
+            throw Error(`No from-model plugin for ${String(m.$$type)}`);
+          },
+        };
+        return plugin.convert(context, model) as ModelToAST<T>;
+      }
+    }
+
+    if (!STANDARD_MODEL_TYPES.has(model.$$type)) {
+      // Non-standard models without a custom plugin cannot be traversed.
+      throw Error(`No from-model plugin for ${String(model.$$type)}`);
+    }
+
+    return buildFromModel(
+      model,
       createElement,
-      convert<U extends DotObjectModel>(m: U): ModelToAST<U> {
-        for (const plugin of plugins) {
-          if (plugin.match(m)) {
-            return plugin.convert(context, m) as ModelToAST<U>;
-          }
-        }
-        throw Error();
-      },
-    };
-    return context.convert(model);
+      commentKind,
+    ) as ModelToAST<T>;
   }
 }

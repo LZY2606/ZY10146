@@ -17,6 +17,9 @@
       "@ts-graphviz/common": [
         "./packages/common/src/common.js"
       ],
+      "@ts-graphviz/common/internal/traversal": [
+        "./packages/common/src/traversal/index.js"
+      ],
       "@ts-graphviz/ast": [
         "./packages/ast/src/ast.js"
       ],

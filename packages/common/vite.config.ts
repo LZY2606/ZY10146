@@ -9,6 +9,7 @@ export default defineConfig({
     lib: {
       entry: {
         common: './src/common.ts',
+        'traversal/index': './src/traversal/index.ts',
       },
       formats: ['es'],
     },

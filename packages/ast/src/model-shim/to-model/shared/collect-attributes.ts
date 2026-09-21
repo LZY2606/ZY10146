@@ -1,5 +1,5 @@
 import type { AttributeValue } from '@ts-graphviz/common';
-import type { AttributeASTNode } from '../../../../types.js';
+import type { AttributeASTNode } from '../../../types.js';
 
 /**
  * Converts an array of attribute AST nodes into a record mapping attribute keys to their processed values.

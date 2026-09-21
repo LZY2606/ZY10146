@@ -1,6 +1,6 @@
 import type { Attribute, AttributeKey } from '@ts-graphviz/common';
-import type { CreateElement } from '../../../../builder/types.js';
-import type { AttributeASTNode } from '../../../../types.js';
+import type { CreateElement } from '../../../builder/types.js';
+import type { AttributeASTNode } from '../../../types.js';
 
 /**
  * Converts an attribute key-value pair into an {@link AttributeASTNode}.

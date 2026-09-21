@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createElement } from '../../../../builder/create-element.js';
+import { createElement } from '../../../builder/create-element.js';
 import { convertAttribute } from './convert-attribute.js';
 
 describe('convertAttribute', () => {

@@ -30,7 +30,8 @@
   "type": "module",
   "exports": {
     ".": "./src/common.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./internal/traversal": "./src/traversal/index.ts"
   },
   "scripts": {
     "build": "vite build"
@@ -51,7 +52,11 @@
         "types": "./lib/common.d.ts",
         "default": "./lib/common.js"
       },
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./internal/traversal": {
+        "types": "./lib/traversal/index.d.ts",
+        "default": "./lib/traversal/index.js"
+      }
     },
     "module": "lib/common.js",
     "types": "lib/common.d.ts"
