@@ -1,19 +1,18 @@
 import type { ASTNode } from '../../types.js';
-import { Printer } from './printer.js';
+import { printWithWalker } from './printer-walker.js';
 import type { PrintOptions } from './types.js';
 
 /**
- * stringify is a function that converts a Graphviz AST Node into a string in DOT language.
+ * stringify converts a Graphviz AST node into a DOT language string.
  *
- * @param ast Graphviz AST node that is to be converted.
+ * The traversal skeleton and child ordering come from the shared AST adapter;
+ * only token emission lives in the printer.
+ *
+ * @param ast Graphviz AST node to convert.
  * @param options PrintOptions object containing formatting options.
  * @returns A string in DOT language.
  * @group Convert AST to DOT
  */
 export function stringify(ast: ASTNode, options?: PrintOptions): string {
-  const result = new Printer(options).print(ast);
-  if (!result) {
-    throw new Error();
-  }
-  return result;
+  return printWithWalker(ast, options ?? {});
 }

@@ -1,4 +1,4 @@
-import type { CommentKind } from '../../../../types.js';
+import type { CommentKind } from '../../../types.js';
 
 /**
  * Zero-width space character (U+200B) used to break up comment-ending sequences.
